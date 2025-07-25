@@ -1,4 +1,8 @@
 ﻿$(document).ready(function () {
+    $('#CPF').each(function () {
+        $(this).mask('000.000.000-00')
+    });
+
     $('#formCadastro').submit(function (e) {
         e.preventDefault();
         $.ajax({
@@ -13,7 +17,8 @@
                 "Estado": $(this).find("#Estado").val(),
                 "Cidade": $(this).find("#Cidade").val(),
                 "Logradouro": $(this).find("#Logradouro").val(),
-                "Telefone": $(this).find("#Telefone").val()
+                "Telefone": $(this).find("#Telefone").val(),
+                "CPF": $(this).find("#CPF").val(),
             },
             error:
             function (r) {
