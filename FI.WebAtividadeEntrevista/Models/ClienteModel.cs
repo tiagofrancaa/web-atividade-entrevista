@@ -66,5 +66,12 @@ namespace WebAtividadeEntrevista.Models
         /// Telefone
         /// </summary>
         public string Telefone { get; set; }
+
+        /// <summary>
+        /// CPF
+        /// </summary>
+        [Required]
+        [Cpf(ErrorMessage = "CPF inválido.")]
+        public string CPF { get; set; }
     }    
 }
