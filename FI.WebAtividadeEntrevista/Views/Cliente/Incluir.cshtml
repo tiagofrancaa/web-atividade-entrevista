@@ -8,7 +8,8 @@
         var urlRetorno = '@Url.Action("Index", "Cliente", new { area = "" })';
     </script>
     @Scripts.Render("~/bundles/clientes")
+    @Scripts.Render("~/bundles/manageBeneficiarios")
 }
 <h2>@Html.Raw(ViewBag.Title)</h2>
-@Html.Partial("Forms")
+@Html.Partial("Forms", new { IsEdit = false })
 @Html.Partial("~/Views/Beneficiario/BeneficiarioModal.cshtml")
