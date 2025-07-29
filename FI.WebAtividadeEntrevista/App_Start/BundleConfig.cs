@@ -40,6 +40,9 @@ namespace FI.WebAtividadeEntrevista
                       "~/Scripts/Clientes/FI.AltClientes.js",
                       "~/Scripts/jquery.mask.min.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/manageBeneficiarios").Include(
+                      "~/Scripts/Beneficiarios/FI.ManageBeneficiarios.js"));
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));

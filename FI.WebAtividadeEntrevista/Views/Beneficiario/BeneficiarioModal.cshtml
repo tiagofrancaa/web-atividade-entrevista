@@ -1,10 +1,8 @@
-@*@model WebAtividadeEntrevista.Models.BeneficiarioModel*@
-
 <div class="modal fade" id="modalBeneficiario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Beneficiário</h4>
             </div>
             <div class="modal-body">
@@ -13,13 +11,13 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="CPFBeneficiario">CPF:</label>
-                                <input required="required" type="text" class="form-control" id="CPFBeneficiario" name="CPFBeneficiario" placeholder="Ex.: 000.011.111-00" maxlength="14">
+                                <input required="required" type="text" class="form-control" id="cpfBeneficiario" name="CPFBeneficiario" placeholder="Ex.: 000.011.111-00" maxlength="14">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="NomeBeneficiario">Nome:</label>
-                                <input required="required" type="text" class="form-control" id="NomeBeneficiario" name="NomeBeneficiario" placeholder="Ex.: Maria" maxlength="30">
+                                <input required="required" type="text" class="form-control" id="nomeBeneficiario" name="NomeBeneficiario" placeholder="Ex.: Maria" maxlength="30">
                             </div>
                         </div>
                         <div class="col-md-4" style="display: flex; align-items: center; margin-top: 25px;">
@@ -27,28 +25,15 @@
                         </div>
                     </div>
                 </form>
-                <hr />
                 <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th>CPF</th>
-                            <th>Nome</th>
-                            <th class="text-end">Ações</th>
+                        <tr style="max-width: auto">
+                            <th class="col-md-4">CPF</th>
+                            <th class="col-md-4">Nome</th>
+                            <th class="col-md-4" style="width: auto;">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr data-id="@item.Id">
-                                <td>@item.Cpf</td>
-                                <td>@item.Nome</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-primary btn-editar" data-id="@item.Id">Alterar</button>
-                                    <button class="btn btn-sm btn-danger btn-excluir" data-id="@item.Id">Excluir</button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
+                    <tbody id="listaBeneficiarios"></tbody>
                 </table>
             </div>
         </div>
