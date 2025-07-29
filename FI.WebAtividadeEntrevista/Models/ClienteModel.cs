@@ -1,8 +1,6 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace WebAtividadeEntrevista.Models
 {
@@ -73,5 +71,9 @@ namespace WebAtividadeEntrevista.Models
         [Required]
         [Cpf(ErrorMessage = "CPF inválido.")]
         public string CPF { get; set; }
+
+        public string BeneficiariosJson { get; set; }
+
+        public List<BeneficiarioModel> Beneficiarios { get; set; } = new List<BeneficiarioModel>();
     }    
 }

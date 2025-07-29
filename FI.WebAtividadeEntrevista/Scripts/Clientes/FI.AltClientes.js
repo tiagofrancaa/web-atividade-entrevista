@@ -33,7 +33,8 @@ $(document).ready(function () {
                 "Cidade": $(this).find("#Cidade").val(),
                 "Logradouro": $(this).find("#Logradouro").val(),
                 "Telefone": $(this).find("#Telefone").val(),
-                "CPF": $(this).find("#CPF").val().replace(/[.\-]/g, '')
+                "CPF": $(this).find("#CPF").val().replace(/[.\-]/g, ''),
+                "BeneficiariosJson": $(this).find("#BeneficiariosJson").val()
             },
             error:
             function (r) {

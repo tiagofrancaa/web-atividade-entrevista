@@ -1,11 +1,12 @@
 ﻿using FI.AtividadeEntrevista.BLL;
-using WebAtividadeEntrevista.Models;
+using FI.AtividadeEntrevista.DML;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using FI.AtividadeEntrevista.DML;
+using WebAtividadeEntrevista.Models;
 
 namespace WebAtividadeEntrevista.Controllers
 {
@@ -25,10 +26,26 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Incluir(ClienteModel model)
         {
-            BoCliente bo = new BoCliente();
+            BoCliente boCliente = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
 
-            if (bo.VerificarExistencia(model.CPF))
+            if (boCliente.VerificarExistencia(model.CPF))
                 ModelState.AddModelError("CPF", "CPF já cadastrado!");
+
+            List<BeneficiarioModel> beneficiarios = model.BeneficiariosJson is null ? new List<BeneficiarioModel>() : JsonConvert.DeserializeObject<List<BeneficiarioModel>>(model.BeneficiariosJson);
+
+            foreach (var beneficiario in beneficiarios)
+            {
+                var validationContext = new ValidationContext(beneficiario);
+                var validationResults = new List<ValidationResult>();
+                if (!Validator.TryValidateObject(beneficiario, validationContext, validationResults, true))
+                {
+                    foreach (var validationResult in validationResults)
+                    {
+                        ModelState.AddModelError("Beneficiarios", "CPF do Beneficiário é inválido!");
+                    }
+                }
+            }
 
             if (!this.ModelState.IsValid)
             {
@@ -39,32 +56,57 @@ namespace WebAtividadeEntrevista.Controllers
                 Response.StatusCode = 400;
                 return Json(string.Join(Environment.NewLine, erros));
             }
-            else
-            {
-                model.Id = bo.Incluir(new Cliente()
-                {                    
-                    CEP = model.CEP,
-                    Cidade = model.Cidade,
-                    Email = model.Email,
-                    Estado = model.Estado,
-                    Logradouro = model.Logradouro,
-                    Nacionalidade = model.Nacionalidade,
-                    Nome = model.Nome,
-                    Sobrenome = model.Sobrenome,
-                    Telefone = model.Telefone,
-                    CPF = model.CPF
-                });
 
-           
-                return Json("Cadastro efetuado com sucesso");
+            model.Id = boCliente.Incluir(new Cliente()
+            {
+                CEP = model.CEP,
+                Cidade = model.Cidade,
+                Email = model.Email,
+                Estado = model.Estado,
+                Logradouro = model.Logradouro,
+                Nacionalidade = model.Nacionalidade,
+                Nome = model.Nome,
+                Sobrenome = model.Sobrenome,
+                Telefone = model.Telefone,
+                CPF = model.CPF
+            });
+
+            foreach (var beneficiario in beneficiarios)
+            {
+                beneficiario.IdCliente = model.Id;
+
+                boBeneficiario.Incluir(new Beneficiario
+                {
+                    Nome = beneficiario.Nome,
+                    CPF = beneficiario.CPF,
+                    IdCliente = model.Id
+                });
             }
+
+            return Json("Cadastro efetuado com sucesso");
         }
 
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
-       
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+            List<BeneficiarioModel> beneficiarios = model.BeneficiariosJson is null ? new List<BeneficiarioModel>() : JsonConvert.DeserializeObject<List<BeneficiarioModel>>(model.BeneficiariosJson);
+
+            foreach (var beneficiario in beneficiarios)
+            {
+                var validationContext = new ValidationContext(beneficiario);
+                var validationResults = new List<ValidationResult>();
+                if (!Validator.TryValidateObject(beneficiario, validationContext, validationResults, true))
+                {
+                    foreach (var validationResult in validationResults)
+                    {
+                        ModelState.AddModelError("Beneficiarios", "CPF do Beneficiário é inválido!");
+                    }
+                }
+            }
+
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -74,36 +116,63 @@ namespace WebAtividadeEntrevista.Controllers
                 Response.StatusCode = 400;
                 return Json(string.Join(Environment.NewLine, erros));
             }
-            else
+
+            bo.Alterar(new Cliente()
             {
-                bo.Alterar(new Cliente()
+                Id = model.Id,
+                CEP = model.CEP,
+                Cidade = model.Cidade,
+                Email = model.Email,
+                Estado = model.Estado,
+                Logradouro = model.Logradouro,
+                Nacionalidade = model.Nacionalidade,
+                Nome = model.Nome,
+                Sobrenome = model.Sobrenome,
+                Telefone = model.Telefone,
+                CPF = model.CPF
+            });
+
+            foreach (var beneficiario in beneficiarios)
+            {
+                if (beneficiario.IsDelete)
                 {
-                    Id = model.Id,
-                    CEP = model.CEP,
-                    Cidade = model.Cidade,
-                    Email = model.Email,
-                    Estado = model.Estado,
-                    Logradouro = model.Logradouro,
-                    Nacionalidade = model.Nacionalidade,
-                    Nome = model.Nome,
-                    Sobrenome = model.Sobrenome,
-                    Telefone = model.Telefone,
-                    CPF = model.CPF
+                    boBeneficiario.Excluir(beneficiario.Id);
+                    continue;
+                }
+
+                if (beneficiario.IsEdit)
+                {
+                    boBeneficiario.Alterar(beneficiario.Nome, beneficiario.CPF, beneficiario.Id);
+                    continue;
+                }
+
+                beneficiario.IdCliente = model.Id;
+
+                boBeneficiario.Incluir(new Beneficiario
+                {
+                    Nome = beneficiario.Nome,
+                    CPF = beneficiario.CPF,
+                    IdCliente = model.Id
                 });
-                               
-                return Json("Cadastro alterado com sucesso");
             }
+
+            return Json("Cadastro alterado com sucesso");
         }
 
         [HttpGet]
         public ActionResult Alterar(long id)
         {
-            BoCliente bo = new BoCliente();
-            Cliente cliente = bo.Consultar(id);
+            BoCliente boCliente = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+            Cliente cliente = boCliente.Consultar(id);
+
             Models.ClienteModel model = null;
 
             if (cliente != null)
             {
+                List<Beneficiario> beneficiarios = boBeneficiario.ListarPorClienteId(id);
+
                 model = new ClienteModel()
                 {
                     Id = cliente.Id,
@@ -116,7 +185,14 @@ namespace WebAtividadeEntrevista.Controllers
                     Nome = cliente.Nome,
                     Sobrenome = cliente.Sobrenome,
                     Telefone = cliente.Telefone,
-                    CPF = cliente.CPF
+                    CPF = cliente.CPF,
+                    Beneficiarios = beneficiarios.Select(b => new BeneficiarioModel
+                    {
+                        Id = b.Id,
+                        Nome = b.Nome,
+                        CPF = b.CPF,
+                        IdCliente = b.IdCliente
+                    }).ToList(),
                 };
             }
 
